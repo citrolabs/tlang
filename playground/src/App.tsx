@@ -13,7 +13,8 @@ import ReactFlow, {
   type Connection,
   type NodeTypes,
   type ReactFlowInstance,
-  ReactFlowProvider
+  ReactFlowProvider,
+  type NodeMouseHandler
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 
@@ -21,8 +22,11 @@ import { CustomNode } from './components/Canvas/CustomNode'
 import { NodePalette } from './components/NodeLibrary/NodePalette'
 import { CodePreview } from './components/CodePanel/CodePreview'
 import { InputPanel } from './components/InputPanel/InputPanel'
-import { Toolbar } from './components/Toolbar/Toolbar'
+import { TopToolbar } from './components/TopToolbar/TopToolbar'
+import { StatusBar } from './components/StatusBar/StatusBar'
+import { NodePropertiesPanel } from './components/NodePropertiesPanel/NodePropertiesPanel'
 import { ExecutionConsole } from './components/ExecutionConsole/ExecutionConsole'
+import { ExamplesDialog } from './components/ExamplesDialog/ExamplesDialog'
 import { getNodeById } from './core/nodes/registry'
 import { generateTLangCode, validateGraph } from './core/graph/transformer'
 import { executeTypeScript, type ExecutionResult } from './services/typeExecutor'
@@ -42,6 +46,12 @@ function AppContent() {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
   const [executing, setExecuting] = useState(false)
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null)
+
+  // UI state
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null)
+  const [showInputValuesDialog, setShowInputValuesDialog] = useState(false)
+  const [showCodeDialog, setShowCodeDialog] = useState(false)
+  const [showExamplesDialog, setShowExamplesDialog] = useState(false)
 
   // Validate connection based on node metadata
   const isValidConnection = useCallback((connection: Connection) => {
@@ -153,6 +163,47 @@ function AppContent() {
     )
   }, [setNodes])
 
+  // Update node data (for properties panel)
+  const updateNodeData = useCallback((nodeId: string, updates: Partial<GraphNode['data']>) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, ...updates } }
+          : node
+      )
+    )
+    // Update selected node
+    if (selectedNode?.id === nodeId) {
+      setSelectedNode((prev) => prev ? { ...prev, data: { ...prev.data, ...updates } } : null)
+    }
+  }, [setNodes, selectedNode])
+
+  // Handle node double click
+  const onNodeDoubleClick: NodeMouseHandler = useCallback((_event, node) => {
+    setSelectedNode(node as GraphNode)
+    // Mark this node as selected
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        selected: n.id === node.id
+      }))
+    )
+  }, [setNodes])
+
+  // Calculate entry/exit nodes for visualization
+  const nodesWithFlowInfo = nodes.map(node => {
+    const hasIncomingEdge = edges.some(e => e.target === node.id)
+    const hasOutgoingEdge = edges.some(e => e.source === node.id)
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        isEntry: !hasIncomingEdge && nodes.length > 1,
+        isExit: !hasOutgoingEdge && nodes.length > 1
+      }
+    }
+  })
+
   // Generate code
   const generatedCode = generateTLangCode(nodes, edges, 'MyTypeFlow')
   const validationErrors = validateGraph(nodes, edges)
@@ -177,12 +228,13 @@ function AppContent() {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100">
-      {/* Top toolbar */}
-      <Toolbar
-        onLoadExample={loadExample}
+      {/* Top Toolbar */}
+      <TopToolbar
+        onLoadExamples={() => setShowExamplesDialog(true)}
         onClearCanvas={clearCanvas}
+        onShowInputValues={() => setShowInputValuesDialog(true)}
+        onShowGeneratedCode={() => setShowCodeDialog(true)}
         nodeCount={nodes.length}
-        edgeCount={edges.length}
       />
 
       {/* Main content area with console */}
@@ -194,7 +246,7 @@ function AppContent() {
           {/* Center: Canvas */}
           <div className="flex-1" ref={reactFlowWrapper}>
             <ReactFlow
-              nodes={nodes}
+              nodes={nodesWithFlowInfo}
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
@@ -203,6 +255,7 @@ function AppContent() {
               onInit={setReactFlowInstance}
               onDrop={onDrop}
               onDragOver={onDragOver}
+              onNodeDoubleClick={onNodeDoubleClick}
               nodeTypes={nodeTypes}
               fitView
               className="bg-gray-50"
@@ -219,23 +272,28 @@ function AppContent() {
             </ReactFlow>
           </div>
 
-          {/* Right: Input panel and code preview */}
-          <div className="w-96 border-l border-gray-200 flex flex-col">
-            {/* Input panel - top half */}
-            <div className="flex-1 border-b border-gray-200 overflow-hidden">
-              <InputPanel
-                nodes={nodes}
-                edges={edges}
-                onUpdateNodeInputs={updateNodeInputs}
-              />
-            </div>
-
-            {/* Code preview - bottom half */}
-            <div className="flex-1 overflow-hidden">
-              <CodePreview code={generatedCode} errors={validationErrors} />
-            </div>
-          </div>
+          {/* Right: Node properties panel (conditional) */}
+          {selectedNode && (
+            <NodePropertiesPanel
+              node={selectedNode}
+              nodes={nodes}
+              edges={edges}
+              onClose={() => {
+                setSelectedNode(null)
+                // Clear selection state
+                setNodes((nds) => nds.map((n) => ({ ...n, selected: false })))
+              }}
+              onUpdate={updateNodeData}
+            />
+          )}
         </div>
+
+        {/* Bottom: Status Bar */}
+        <StatusBar
+          nodeCount={nodes.length}
+          edgeCount={edges.length}
+          errors={validationErrors.length}
+        />
 
         {/* Bottom: Execution console */}
         <ExecutionConsole
@@ -245,6 +303,59 @@ function AppContent() {
           hasErrors={validationErrors.length > 0}
         />
       </div>
+
+      {/* Dialogs */}
+      {showExamplesDialog && (
+        <ExamplesDialog
+          onLoadExample={(project) => {
+            loadExample(project)
+            setShowExamplesDialog(false)
+          }}
+          onClose={() => setShowExamplesDialog(false)}
+        />
+      )}
+
+      {showInputValuesDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-[800px] h-[600px] flex flex-col">
+            <div className="h-12 bg-gray-100 border-b border-gray-300 flex items-center justify-between px-4">
+              <h2 className="font-semibold text-gray-800">Input Values</h2>
+              <button
+                onClick={() => setShowInputValuesDialog(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <InputPanel
+                nodes={nodes}
+                edges={edges}
+                onUpdateNodeInputs={updateNodeInputs}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCodeDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-[800px] h-[600px] flex flex-col">
+            <div className="h-12 bg-gray-100 border-b border-gray-300 flex items-center justify-between px-4">
+              <h2 className="font-semibold text-gray-800">Generated Code</h2>
+              <button
+                onClick={() => setShowCodeDialog(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <CodePreview code={generatedCode} errors={validationErrors} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

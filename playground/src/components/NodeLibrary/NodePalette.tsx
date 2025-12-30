@@ -9,7 +9,7 @@ import { getAllCategories, getNodesByCategory } from '../../core/nodes/registry'
 import { NodeCard } from './NodeCard'
 
 export function NodePalette() {
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['Numbers']))
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const categories = getAllCategories()
 
   const toggleCategory = (category: string) => {

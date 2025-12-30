@@ -211,12 +211,22 @@ tlang comes with a **full-featured visual editor** that brings type-level progra
 <table>
   <tr>
     <td width="50%">
-      <img src="./media/playground-1.png" alt="tlang Visual Playground - String Transformations" />
-      <p align="center"><strong>String Transformation Pipeline</strong><br/>Drag nodes from the left panel, connect them visually, and watch the magic happen!</p>
+      <img src="./media/playground-1.png" alt="tlang Visual Playground - Main Interface" />
+      <p align="center"><strong>Visual Node Editor</strong><br/>Drag nodes from the library, connect ports to build type transformation flows, and configure selected nodes in the properties panel!</p>
     </td>
     <td width="50%">
-      <img src="./media/playground-2.png" alt="tlang Visual Playground - Number Operations" />
-      <p align="center"><strong>Real-time Type Execution</strong><br/>See computed results instantly with TypeScript's type checker running in your browser!</p>
+      <img src="./media/playground-2.png" alt="tlang Visual Playground - Example Projects" />
+      <p align="center"><strong>Pre-built Examples</strong><br/>Load ready-to-use examples: string transformations, number calculations, object processing, and real-world API scenarios!</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="./media/playground-3.png" alt="tlang Visual Playground - Input Configuration" />
+      <p align="center"><strong>Input Values Dialog</strong><br/>Configure entry node inputs to test your type flows - only shows nodes without incoming connections!</p>
+    </td>
+    <td width="50%">
+      <img src="./media/playground-4.png" alt="tlang Visual Playground - Code Generation" />
+      <p align="center"><strong>Generated TypeScript Code</strong><br/>View the generated type-level code with syntax highlighting - copy and use directly in your projects!</p>
     </td>
   </tr>
 </table>

@@ -17,6 +17,12 @@ export interface CustomNodeData {
 
   /** Input values (for constant inputs) */
   inputs?: Record<string, unknown>
+
+  /** Whether this node is an entry point (no incoming edges) */
+  isEntry?: boolean
+
+  /** Whether this node is an exit point (no outgoing edges) */
+  isExit?: boolean
 }
 
 /**

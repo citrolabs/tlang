@@ -5,16 +5,21 @@
 
 import { memo } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
+import { ArrowRight, Target } from 'lucide-react'
 import type { CustomNodeData } from '../../types/graph'
 
-export const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
-  const { metadata } = data
+export const CustomNode = memo(({ data, selected }: NodeProps<CustomNodeData>) => {
+  const { metadata, isEntry, isExit } = data
 
   return (
     <div
-      className="px-4 py-3 rounded-lg border-2 shadow-lg min-w-[180px] bg-white"
+      className={`px-4 py-3 rounded-lg min-w-[180px] bg-white transition-all ${
+        selected
+          ? 'border-4 shadow-2xl ring-4 ring-blue-200'
+          : 'border-2 shadow-lg'
+      }`}
       style={{
-        borderColor: metadata.style.color
+        borderColor: selected ? '#3b82f6' : metadata.style.color
       }}
     >
       {/* Node header */}
@@ -22,7 +27,19 @@ export const CustomNode = memo(({ data }: NodeProps<CustomNodeData>) => {
         className="font-bold text-sm mb-2 flex items-center gap-2"
         style={{ color: metadata.style.color }}
       >
+        {isEntry && (
+          <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+            <Target className="w-3 h-3" />
+            Entry
+          </span>
+        )}
         <span>{metadata.name}</span>
+        {isExit && (
+          <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+            <ArrowRight className="w-3 h-3" />
+            Exit
+          </span>
+        )}
       </div>
 
       {/* Category badge */}
