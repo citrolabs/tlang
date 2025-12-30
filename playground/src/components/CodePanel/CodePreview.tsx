@@ -41,7 +41,7 @@ export function CodePreview({ code, errors = [] }: CodePreviewProps) {
         <div>
           <h2 className="text-lg font-bold text-gray-800">Generated Code</h2>
           <p className="text-xs text-gray-500 mt-1">
-            tlang Network definition
+            tlang TypeFlow definition
           </p>
         </div>
         <button

@@ -56,10 +56,10 @@ type PublicUser = Pipe<User, [
 // Result: { id: number; email: string }
 ```
 
-### DAG Networks (Unique to tlang!)
+### DAG TypeFlows (Unique to tlang!)
 
 ```typescript
-import type { Exec, Out, Network } from 'tlang'
+import type { Exec, Out, TypeFlow } from 'tlang'
 
 // Branching: One input, multiple outputs
 type Split = Exec<SplitNode, { value: 3 }>
@@ -75,8 +75,8 @@ type Merged = Exec<AddNode, {
 }>
 // { sum: 12 }
 
-// Declarative Network Definition
-type MyNetwork = Network<
+// Declarative TypeFlow Definition
+type MyTypeFlow = TypeFlow<
   {
     split: SplitNode
     doubleNode: DoubleNode
@@ -139,11 +139,11 @@ type Result = Pipe<5, [DoubleNode, IncrementNode]>
 // 11
 ```
 
-### Network
+### TypeFlow
 Declarative DAG definition:
 
 ```typescript
-type MyNetwork = Network<
+type MyTypeFlow = TypeFlow<
   { node1: Node1, node2: Node2 },
   [{ from: {...}, to: {...} }],
   { initialData }
@@ -176,7 +176,7 @@ type MyNetwork = Network<
 
 ```typescript
 // Transform backend data through validation and formatting
-type UserProcessing = Network<
+type UserProcessing = TypeFlow<
   {
     split: UserSplitNode,
     validateEmail: ValidateEmailNode,
@@ -197,7 +197,7 @@ type UserProcessing = Network<
 
 ```typescript
 // One input branches to multiple validators, then merges results
-type FormValidation = Network<
+type FormValidation = TypeFlow<
   { split: SplitInput, emailCheck: Email, phoneCheck: Phone, merge: CombineResults },
   [/* connections */],
   { formData }
@@ -266,4 +266,4 @@ MIT
 
 ---
 
-**tlang: Type-level programming, evolved. 🚀**
+**Tlang: Type-level programming, evolved. 🚀**

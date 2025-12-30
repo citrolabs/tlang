@@ -22,7 +22,7 @@
  */
 
 // Core FBP primitives
-export type { Node, Exec, Out, Pipe, nodeInputs, Network, Connection } from './core'
+export type { Node, Exec, Out, Pipe, nodeInputs, TypeFlow, Connection } from './core'
 
 // Basic transformation nodes
 export type {

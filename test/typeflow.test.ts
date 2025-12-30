@@ -1,5 +1,5 @@
 /**
- * Network execution tests
+ * TypeFlow execution tests
  *
  * Testing true FBP multi-port nodes and network execution
  * This is where tlang shows its power over HotScript!
@@ -31,7 +31,7 @@ describe('Multi-port node execution', () => {
   })
 })
 
-describe('Network definition and execution', () => {
+describe('TypeFlow definition and execution', () => {
   it('should define a simple network structure', () => {
     // Simple network: just one doubler node
     type SimpleNet = {
@@ -61,7 +61,7 @@ describe('Network definition and execution', () => {
 
   it('should execute a network and extract results', () => {
     // Execute the network using manual orchestration
-    // Network: input (4) -> doubler -> 8
+    // TypeFlow: input (4) -> doubler -> 8
 
     type DoublerOutputs = Exec<DoubleNode, { in: 4 }>
     type DoublerOutput = Out<DoublerOutputs, 'out'>
@@ -73,7 +73,7 @@ describe('Network definition and execution', () => {
 
 describe('Connected networks with data flow', () => {
   it('should chain two nodes together', () => {
-    // Network: input (3) -> double -> 6 -> increment -> 7
+    // TypeFlow: input (3) -> double -> 6 -> increment -> 7
     // Manual orchestration using Exec + Out
 
     type Step1 = Exec<DoubleNode, { in: 3 }>
@@ -85,7 +85,7 @@ describe('Connected networks with data flow', () => {
   })
 
   it('should chain two nodes using Pipe sugar', () => {
-    // Network: input (3) -> double -> 6 -> increment -> 7
+    // TypeFlow: input (3) -> double -> 6 -> increment -> 7
     // Using Pipe syntax sugar
 
     type Result = Pipe<3, [DoubleNode, IncrementNode]>
@@ -95,7 +95,7 @@ describe('Connected networks with data flow', () => {
   })
 
   it('should handle multiple inputs from different sources', () => {
-    // Network: two doublers feeding into one adder
+    // TypeFlow: two doublers feeding into one adder
     // input1 (2) -> double -> 4 \
     //                              > add -> 10
     // input2 (3) -> double -> 6 /
@@ -113,7 +113,7 @@ describe('Connected networks with data flow', () => {
   })
 
   it('should handle complex DAG with multiple paths', () => {
-    // Network:
+    // TypeFlow:
     //         /-> doubled -> 6 \
     // 3 -> split                > add -> 9
     //         \-> original -> 3 /

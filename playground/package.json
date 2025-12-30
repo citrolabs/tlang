@@ -4,10 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run bundle-tlang && vite build",
+    "build": "pnpm run generate && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
+    "generate": "pnpm run generate-registry && pnpm run bundle-tlang",
+    "generate-registry": "node scripts/generate-registry.js",
     "bundle-tlang": "node scripts/bundle-tlang-sources.js"
   },
   "dependencies": {

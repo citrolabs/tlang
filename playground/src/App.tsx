@@ -154,7 +154,7 @@ function AppContent() {
   }, [setNodes])
 
   // Generate code
-  const generatedCode = generateTLangCode(nodes, edges, 'MyNetwork')
+  const generatedCode = generateTLangCode(nodes, edges, 'MyTypeFlow')
   const validationErrors = validateGraph(nodes, edges)
 
   // Execute TypeScript code

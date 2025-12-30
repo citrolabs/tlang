@@ -37,7 +37,7 @@ let libFilesCache: Map<string, string> | null = null
  * 3. Compile and type-check the code
  * 4. Extract computed type information
  *
- * @param code - Generated tlang Network code to execute
+ * @param code - Generated tlang TypeFlow code to execute
  * @returns ExecutionResult with success status and computed type
  */
 export async function executeTypeScript(code: string): Promise<ExecutionResult> {
@@ -150,7 +150,7 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
 
     // Step 8: Extract metadata from the AST
     let hasImports = false
-    let hasNetworkType = false
+    let hasTypeFlowType = false
     let networkTypeName = ''
     let nodeCount = 0
     let connectionCount = 0
@@ -168,9 +168,9 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
         const typeName = node.name.text
         const typeText = node.type.getText(sourceFile)
 
-        // Detect Network type
-        if (typeText.includes('Network<')) {
-          hasNetworkType = true
+        // Detect TypeFlow type
+        if (typeText.includes('TypeFlow<')) {
+          hasTypeFlowType = true
           networkTypeName = typeName
 
           // Count nodes in the network definition
@@ -308,11 +308,11 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
       }
     }
 
-    if (!hasNetworkType) {
+    if (!hasTypeFlowType) {
       return {
         success: false,
-        error: 'No Network type definition found',
-        diagnostics: ['Code must define a type using Network<...>']
+        error: 'No TypeFlow type definition found',
+        diagnostics: ['Code must define a type using TypeFlow<...>']
       }
     }
 
@@ -320,7 +320,7 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
       return {
         success: false,
         error: 'No Result type found',
-        diagnostics: ['Code must define: type Result = YourNetworkType']
+        diagnostics: ['Code must define: type Result = YourTypeFlowType']
       }
     }
 
@@ -328,8 +328,8 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
     const successDiagnostics = [
       '✓ Syntax validation passed',
       '✓ Import statements verified',
-      `✓ Network "${networkTypeName}" parsed successfully`,
-      `✓ Network contains ${nodeCount} node${nodeCount !== 1 ? 's' : ''} and ${connectionCount} connection${connectionCount !== 1 ? 's' : ''}`,
+      `✓ TypeFlow "${networkTypeName}" parsed successfully`,
+      `✓ TypeFlow contains ${nodeCount} node${nodeCount !== 1 ? 's' : ''} and ${connectionCount} connection${connectionCount !== 1 ? 's' : ''}`,
       '✓ Type computation completed successfully'
     ]
 
@@ -337,7 +337,7 @@ export async function executeTypeScript(code: string): Promise<ExecutionResult> 
       success: true,
       result: `Type computation executed successfully!
 
-Network: ${networkTypeName}
+TypeFlow: ${networkTypeName}
 Nodes: ${nodeCount}
 Connections: ${connectionCount}
 

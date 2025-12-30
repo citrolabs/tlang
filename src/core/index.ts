@@ -102,7 +102,7 @@ export type Connection = {
 }
 
 /**
- * Network - DAG of interconnected nodes
+ * TypeFlow - DAG of interconnected nodes
  *
  * Supports:
  * - Branching: one output to multiple inputs
@@ -115,7 +115,7 @@ export type Connection = {
  * @template Connections - Array of connections defining the graph
  * @template InitialData - Initial packets to inject into the network
  */
-export type Network<
+export type TypeFlow<
   Nodes extends Record<string, Node>,
   Connections extends readonly Connection[],
   InitialData extends Record<string, unknown>

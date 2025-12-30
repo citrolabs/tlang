@@ -1,5 +1,5 @@
 /**
- * Network DAG Examples - Demonstrating tlang's superior DAG capabilities
+ * TypeFlow DAG Examples - Demonstrating tlang's superior DAG capabilities
  *
  * These examples showcase computational graph structures that HotScript's Pipe cannot express:
  * - Branching (one output flows to multiple nodes)
@@ -7,7 +7,7 @@
  * - Complex DAG (arbitrary graph structures)
  */
 
-import type { Exec, Out, Node, nodeInputs, Network } from 'tlang'
+import type { Exec, Out, Node, nodeInputs, TypeFlow } from 'tlang'
 
 // ========================================
 // Define Nodes
@@ -94,8 +94,8 @@ type BranchB = Exec<IncrementNode, { in: Out<Splitter, 'original'> }>
 const branchAResult: Out<BranchA, 'product'> = 6
 const branchBResult: Out<BranchB, 'sum'> = 4
 
-// Network definition (declarative)
-type SimpleBranchNetwork = Network<
+// TypeFlow definition (declarative)
+type SimpleBranchTypeFlow = TypeFlow<
   {
     split: SplitNode
     doubleNode: DoubleNode
@@ -138,8 +138,8 @@ type Merge = Exec<AddNode, {
 
 const mergeResult: Out<Merge, 'sum'> = 12
 
-// Network definition
-type MergeNetwork = Network<
+// TypeFlow definition
+type MergeTypeFlow = TypeFlow<
   {
     split: SplitNode
     doubleNode: DoubleNode
@@ -200,8 +200,8 @@ type Add2 = Exec<AddNode, {
 
 const complexResult: Out<Add2, 'sum'> = 15
 
-// Network definition
-type ComplexDAGNetwork = Network<
+// TypeFlow definition
+type ComplexDAGTypeFlow = TypeFlow<
   {
     split0: SplitNode
     split1: SplitNode
@@ -294,8 +294,8 @@ interface MergeUserNode extends Node {
   }
 }
 
-// Network definition for user processing
-type UserProcessingNetwork = Network<
+// TypeFlow definition for user processing
+type UserProcessingTypeFlow = TypeFlow<
   {
     userSplit: UserSplitNode
     validateEmail: ValidateEmailNode
@@ -329,10 +329,10 @@ export type {
   branchBResult,
   mergeResult,
   complexResult,
-  SimpleBranchNetwork,
-  MergeNetwork,
-  ComplexDAGNetwork,
-  UserProcessingNetwork
+  SimpleBranchTypeFlow,
+  MergeTypeFlow,
+  ComplexDAGTypeFlow,
+  UserProcessingTypeFlow
 }
 
 /**
@@ -343,7 +343,7 @@ export type {
  * - Merging: multiple outputs converge to one node
  * - Multi-input nodes: { a, b } naturally expressed
  * - Complex DAG: arbitrary graph structures
- * - Network declarative definition
+ * - TypeFlow declarative definition
  *
  * ❌ HotScript cannot express:
  * - Pipe only supports single-parameter linear flow
