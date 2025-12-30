@@ -313,11 +313,167 @@ export const exampleBooleanLogic: Project = {
 }
 
 /**
+ * Example 5: RealWorld - Event Data Validation
+ * Demonstrates complex nested object validation and transformation
+ *
+ * Business scenario: User event tracking with sensitive data filtering
+ * Input: Full event envelope with user info, environment, and event data
+ * Output: Validated, sanitized event ready for analytics pipeline
+ */
+export const exampleRealWorldEventValidation: Project = {
+  id: 'example-realworld-event-validation',
+  name: 'EventDataValidation',
+  description: 'Complex nested object validation: extract required fields, remove sensitive data, and create readonly analytics event',
+  nodes: [
+    {
+      id: 'pick_user_fields',
+      type: 'tlangNode',
+      position: { x: 100, y: 100 },
+      data: {
+        metadata: {
+          id: 'Pick',
+          name: 'Pick',
+          category: 'Objects',
+          description: 'Pick specific fields from object type',
+          inputs: [{ id: 'in', label: 'Object', type: 'object', required: true }],
+          outputs: [{ id: 'out', label: 'Picked', type: 'object', required: false }],
+          tlangType: 'Pick<"id" | "sessionId">',
+          style: { color: '#f59e0b' }
+        },
+        label: 'Pick User Fields',
+        inputs: {
+          in: {
+            id: 'user_123',
+            sessionId: 'session_456',
+            email: 'user@example.com',
+            passwordHash: 'secret_hash_value'
+          }
+        }
+      }
+    },
+    {
+      id: 'omit_sensitive',
+      type: 'tlangNode',
+      position: { x: 100, y: 250 },
+      data: {
+        metadata: {
+          id: 'Omit',
+          name: 'Omit',
+          category: 'Objects',
+          description: 'Omit sensitive fields from object type',
+          inputs: [{ id: 'in', label: 'Object', type: 'object', required: true }],
+          outputs: [{ id: 'out', label: 'Sanitized', type: 'object', required: false }],
+          tlangType: 'Omit<"ipAddress" | "deviceFingerprint">',
+          style: { color: '#f59e0b' }
+        },
+        label: 'Omit Sensitive Data',
+        inputs: {
+          in: {
+            clientVersion: '2.1.0',
+            platform: 'web',
+            timezone: 'UTC',
+            ipAddress: '192.168.1.1',
+            deviceFingerprint: 'unique_device_id'
+          }
+        }
+      }
+    },
+    {
+      id: 'partial_metadata',
+      type: 'tlangNode',
+      position: { x: 450, y: 100 },
+      data: {
+        metadata: {
+          id: 'Partial',
+          name: 'Partial',
+          category: 'Objects',
+          description: 'Make all properties optional',
+          inputs: [{ id: 'in', label: 'Object', type: 'object', required: true }],
+          outputs: [{ id: 'out', label: 'Partial', type: 'object', required: false }],
+          tlangType: 'Partial',
+          style: { color: '#f59e0b' }
+        },
+        label: 'Partial Metadata'
+      }
+    },
+    {
+      id: 'readonly_event',
+      type: 'tlangNode',
+      position: { x: 450, y: 250 },
+      data: {
+        metadata: {
+          id: 'DeepReadonly',
+          name: 'DeepReadonly',
+          category: 'Objects',
+          description: 'Make entire object structure deeply readonly',
+          inputs: [{ id: 'in', label: 'Object', type: 'object', required: true }],
+          outputs: [{ id: 'out', label: 'Immutable', type: 'object', required: false }],
+          tlangType: 'DeepReadonly',
+          style: { color: '#f59e0b' }
+        },
+        label: 'DeepReadonly Event'
+      }
+    },
+    {
+      id: 'required_fields',
+      type: 'tlangNode',
+      position: { x: 750, y: 175 },
+      data: {
+        metadata: {
+          id: 'Required',
+          name: 'Required',
+          category: 'Objects',
+          description: 'Make all properties required (remove optionality)',
+          inputs: [{ id: 'in', label: 'Object', type: 'object', required: true }],
+          outputs: [{ id: 'out', label: 'Required', type: 'object', required: false }],
+          tlangType: 'Required',
+          style: { color: '#f59e0b' }
+        },
+        label: 'Require All Fields'
+      }
+    }
+  ],
+  edges: [
+    {
+      id: 'e1',
+      source: 'pick_user_fields',
+      sourceHandle: 'out',
+      target: 'partial_metadata',
+      targetHandle: 'in'
+    },
+    {
+      id: 'e2',
+      source: 'omit_sensitive',
+      sourceHandle: 'out',
+      target: 'readonly_event',
+      targetHandle: 'in'
+    },
+    {
+      id: 'e3',
+      source: 'partial_metadata',
+      sourceHandle: 'out',
+      target: 'required_fields',
+      targetHandle: 'in'
+    },
+    {
+      id: 'e4',
+      source: 'readonly_event',
+      sourceHandle: 'out',
+      target: 'required_fields',
+      targetHandle: 'in'
+    }
+  ],
+  createdAt: Date.now(),
+  updatedAt: Date.now()
+}
+
+/**
  * All example projects
  */
 export const exampleProjects = [
   exampleStringTransform,
   exampleNumberArithmetic,
   exampleObjectTransform,
-  exampleBooleanLogic
+  exampleBooleanLogic,
+  exampleRealWorldEventValidation
 ]

@@ -38,14 +38,18 @@ function extractImports(nodes: GraphNode[]): { namespaces: Set<string>; topLevel
   nodes.forEach(node => {
     const tlangType = node.data.metadata.tlangType
 
-    // Check if it's a top-level export (no dot in name)
-    if (!tlangType.includes('.')) {
-      if (topLevelExports.has(tlangType)) {
-        topLevelTypes.add(tlangType)
+    // Extract base type name from generic types (e.g., "Pick<...>" → "Pick")
+    const genericMatch = tlangType.match(/^([^<.]+)/)
+    const baseTypeName = genericMatch?.[1] ?? tlangType
+
+    // Check if it's a top-level export (no dot in base name)
+    if (!baseTypeName.includes('.')) {
+      if (topLevelExports.has(baseTypeName)) {
+        topLevelTypes.add(baseTypeName)
       }
     } else {
       // Extract namespace (e.g., "Strings" from "Strings.Uppercase")
-      const namespace = tlangType.split('.')[0]
+      const namespace = baseTypeName.split('.')[0]
       if (namespace) {
         namespaces.add(namespace)
       }
